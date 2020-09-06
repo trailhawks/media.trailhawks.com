@@ -1,0 +1,28 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build and Publish Docker image
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: build and push image
+        uses: docker/build-push-action@v1
+        env:
+          DOCKER_BUILDKIT: 1
+          INPUT_CACHE_FROMS: ${{ github.repository }}/media.trailhawks.com:latest
+        with:
+          always_pull: true
+          dockerfile: "./Dockerfile"
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: ${{ github.repository }}/media.trailhawks.com
+          tag_with_ref: true
+          tag_with_sha: true
+          tags: latest
+          username: ${{ github.actor }}
